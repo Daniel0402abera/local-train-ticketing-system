@@ -50,7 +50,7 @@ const HomeView = () => {
   };
 
   return (
-    <Container className={classes.container} maxWidth="md">
+    <Container className={classes.container} maxWidth="md" style={{marginTop:'10vh'}}>
       <Typography variant="h3" align="center" gutterBottom>
         Welcome to Train Booking
       </Typography>

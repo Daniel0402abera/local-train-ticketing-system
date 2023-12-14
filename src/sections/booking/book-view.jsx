@@ -31,7 +31,7 @@ const BookView = () => {
   };
 
   return (
-    <Container maxWidth="md">
+    <Container maxWidth="md" style={{marginTop:'10vh'}}>
       <Typography variant="h4" align="center" gutterBottom>
         Booking Page
       </Typography>
