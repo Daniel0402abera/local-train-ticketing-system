@@ -6,7 +6,7 @@
 /* eslint-disable spaced-comment */
 /* eslint-disable import/extensions */
 /* eslint-disable import/no-unresolved */
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState} from 'react';
 /* eslint-disable import/no-extraneous-dependencies */
 import {
   MRT_EditActionButtons,
@@ -18,26 +18,29 @@ import EditIcon from '@mui/icons-material/Edit';
 import {
   Box,
   Button,
+  Container,
   DialogActions,
   DialogContent,
   DialogTitle,
   IconButton,
+  InputLabel,
+  MenuItem,
   TextField,
   Tooltip,
   Typography,
 } from '@mui/material';
 
 import { useGet } from '../../service/useGet';
-import { usePost } from '../../service/usePost';
 // import { validateUser } from "../utils/validation";
 import { useUpdate } from '../../service/useUpdate';
-import { useDelete } from '../../service/useDelete';
+// import { useDelete } from '../../service/useDelete';
 
 function TicketPage() {
-  const [validationErrors, setValidationErrors] = useState({});
-  const [name, setName] = React.useState('');
+  const [trainId, setTrainId] = React.useState('');
 //   const [manager, setManager] = React.useState('');
-  const [description, setDescription] = React.useState('');
+  const [departureTime, setDepartureTime] = React.useState('');
+  const [rowSelection, setRowSelection] = useState({});
+  const [rowSelectionId, setRowSelectionId] = useState([]);
 
   // const formik = useFormik({
   //   6     initialValues: {
@@ -59,61 +62,57 @@ function TicketPage() {
   const columns = useMemo(
     () => [
       {
-        accessorKey: 'id',
-        header: 'Id',
-        enableEditing: false,
-        size: 80,
-      },
-      {
-        accessorKey: 'name',
-        header: 'Location Name',
-        muiEditTextFieldProps: {
-          required: true,
-          error: !!validationErrors?.fullName,
-          helperText: validationErrors?.fullName,
-          // remove any previous validation errors when user focuses on the input
-          onFocus: () =>
-            setValidationErrors({
-              ...validationErrors,
-              firstName: undefined,
-            }),
-          // optionally add validation checking for onBlur or onChange
-        },
+        accessorKey: 'fairPerSeat',
+        header: 'Fair Per Seat',
       },    
       {
-        accessorKey: 'description',
-        header: 'description',
+        accessorKey: 'seatNumber',
+        header: 'Seat Number',
+      },
+      {
+        accessorKey: 'bookingTime',
+        header: 'Booking Time',
+      },
+      {
+        accessorKey: 'status',
+        header: 'Status',
       },
     ],
-    [validationErrors]
+    []
   );
 
   //call CREATE hook
-  const { mutateAsync: createUser, isPending: isCreatingUser } = usePost('/api/v1/locations');
+  // const { mutateAsync: createUser, isPending: isCreatingUser } = usePost('/api/v1/locations');
   //call READ hook
+  
   const {
-    data: fetchedUsers,
-    isError: isLoadingUsersError,
-    isFetching: isFetchingUsers,
-    isLoading: isLoadingUsers,
-  } = useGet('/api/v1/locations');
+    data: fetchedSchedules,
+    isError:isLoadingScheduleError,
+    // isFetching:isFetchingSchedule,
+    // isPending: isLoadingSchedule,
+  } = useGet(`api/v1/tickets/mine?trainId=${trainId}`);
+
+  const {
+    data: fetchedTrain,
+    isPending: isLoadingTrain,
+  } = useGet('/api/v1/trains');
 
   // eslint-disable-next-line spaced-comment
   //call UPDATE hook
-  const { mutateAsync: updateUser, isPending: isUpdatingUser } = useUpdate('/api/v1/locations');
+  const { mutateAsync: updateUser, isPending: isUpdatingUser } = useUpdate(`api/v1/tickets/confirm?trainId=${trainId}`);
   //call DELETE hook
-  const { isPending: isDeletingUser } = useDelete();
+//   const { isPending: isDeletingUser } = useDelete();
+
+
 
   //CREATE action
-  const handleCreateUser = async ({ values }) => {
+  const handleCreateSchedule = async ({ values }) => {
   
-
-    const transformedData = {
-      "name": name,
-      "description": description,
-    }
-    
-    await createUser(transformedData);
+ console.log('rrrrr',rowSelectionId,rowSelection)
+    const booked = {
+        "seatNumbers": rowSelectionId
+      }
+ await updateUser(booked);
     table.setCreatingRow(null); //exit creating mode
   };
 
@@ -129,15 +128,25 @@ function TicketPage() {
     table.setEditingRow(null); //exit editing mode
   };
 
+
+  useEffect(() => {
+    const IdOfSelected = Object.keys(rowSelection);
+    setRowSelectionId(IdOfSelected);
+  }, [rowSelection]);
+
+
   const table = useMaterialReactTable({
     columns,
-    data: fetchedUsers || [],
+    data: fetchedSchedules || [],
     createDisplayMode: 'modal',
     editDisplayMode: 'modal',
     enableEditing: true,
+    enableRowSelection: true,
+    onRowSelectionChange: setRowSelection,
+    state: { rowSelection },
     positionActionsColumn: 'last',
-    getRowId: (row) => row.id,
-    muiToolbarAlertBannerProps: isLoadingUsersError
+    getRowId: (row) => row.seatNumber,
+    muiToolbarAlertBannerProps: isLoadingScheduleError
       ? {
           color: 'error',
           children: 'Error loading data',
@@ -148,32 +157,38 @@ function TicketPage() {
         minHeight: '500px',
       },
     },
-    onCreatingRowCancel: () => setValidationErrors({}),
-    onCreatingRowSave: handleCreateUser,
-    onEditingRowCancel: () => setValidationErrors({}),
+    // onCreatingRowCancel: () => setValidationErrors({}),
+    onCreatingRowSave: handleCreateSchedule,
+    // onEditingRowCancel: () => setValidationErrors({}),
     onEditingRowSave: handleSaveUser,
     renderCreateRowDialogContent: ({ table, row, internalEditComponents }) => (
       <>
         <DialogTitle variant="h5">Create New Location</DialogTitle>
         <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+        <TextField
+              fullWidth
+              select
+              style={{ marginTop: '10px' }}
+              // id={name}
+              name=""
+              label="Train Name"
+              value={trainId}
+              onChange={(e)=> setTrainId(e.target.value)}
+        
+            >
+              {fetchedTrain?.map((train) => (
+                <MenuItem key={train?.id} value={train?.id}>
+                  {isLoadingTrain?"loading...":train?.trainName}
+                </MenuItem>
+              ))}
+            </TextField>
+          <InputLabel id="demo-simple-select-label">Schedule Time</InputLabel>
           <TextField
+            type="datetime-local"
             style={{ marginTop: '10px' }}
             id="outlined-controlled"
-            label="Location Name"
-            value={name}
-            onChange={(event) => {
-              setName(event.target.value);
-            }}
-          />
-
-          <TextField
-            style={{ marginTop: '10px' }}
-            id="outlined-controlled"
-            label="Description"
-            value={description}
-            onChange={(event) => {
-              setDescription(event.target.value);
-            }}
+            value={departureTime}
+            onChange={(e)=> setDepartureTime(e.target.value) }
           />
         </DialogContent>
         <DialogActions>
@@ -202,7 +217,7 @@ function TicketPage() {
         </Tooltip>
       </Box>
     ),
-    renderTopToolbarCustomActions: ({ table }) => (
+    renderBottomToolbarCustomActions: ({ table }) => (
       <Button
         variant="contained"
         style={{
@@ -212,29 +227,46 @@ function TicketPage() {
           backgroundColor: 'green',
           color: 'white',
         }}
-        onClick={() => {
-          table.setCreatingRow(true);
-        }}
+        onClick={handleCreateSchedule}
       >
-        Create New Location
+        {isUpdatingUser?"Confirming...":'Confirm Booked'} 
       </Button>
     ),
 
-    state: {
-      isLoading: isLoadingUsers,
-      isSaving: isCreatingUser || isUpdatingUser || isDeletingUser,
-      showAlertBanner: isLoadingUsersError,
-      showProgressBars: isFetchingUsers,
-    },
+    // state: {
+    //   isLoading: isLoadingSchedule,
+    //   isSaving:  isUpdatingUser || isDeletingUser,
+    //   showAlertBanner: isLoadingScheduleError,
+    //   showProgressBars: isFetchingSchedule,
+    // },
   });
 
   return (
     <>
       <Typography variant="h4" sx={{ mb: 5 }}>
-        Location list
+        Booking Page
       </Typography>
+      <Container>
+      <TextField
+              fullWidth
+              select
+              style={{ marginTop: '10px' }}
+              // id={name}
+              name=""
+              label="Train Name"
+              value={trainId}
+              onChange={(e)=> setTrainId(e.target.value)}
+        
+            >
+              {fetchedTrain?.map((train) => (
+                <MenuItem key={train?.id} value={train?.id}>
+                  {isLoadingTrain?"loading...":train?.trainName}
+                </MenuItem>
+              ))}
+            </TextField>
+      </Container>
       <MaterialReactTable table={table} />
-      
+     
       
 
     </>

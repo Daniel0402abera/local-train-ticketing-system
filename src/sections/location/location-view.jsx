@@ -36,6 +36,8 @@ import { useDelete } from '../../service/useDelete';
 function LocationPage() {
   const [validationErrors, setValidationErrors] = useState({});
   const [name, setName] = React.useState('');
+  const [locationId, setLocationId] = React.useState('');
+
 //   const [manager, setManager] = React.useState('');
   const [description, setDescription] = React.useState('');
 
@@ -100,7 +102,7 @@ function LocationPage() {
 
   // eslint-disable-next-line spaced-comment
   //call UPDATE hook
-  const { mutateAsync: updateUser, isPending: isUpdatingUser } = useUpdate('/api/v1/locations');
+  const { mutateAsync: updateUser, isPending: isUpdatingUser } = useUpdate(`/api/v1/locations/${locationId}`);
   //call DELETE hook
   const { isPending: isDeletingUser } = useDelete();
 
@@ -119,10 +121,11 @@ function LocationPage() {
 
   //UPDATE action
   const handleSaveUser = async ({ values, table }) => {
-
+    setLocationId(values?.id)
 
     const data = {
-      fullName: values?.fullName,
+      name: values?.name,
+      description:values?.description
     };
 
     await updateUser(data);

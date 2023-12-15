@@ -1,37 +1,36 @@
 import React, { useState } from 'react';
 
 // eslint-disable-next-line import/no-extraneous-dependencies
-import {
-  Grid,
-  List,
-  Paper,
-  Button,
-  ListItem,
-  Container,
-  TextField,
-  Typography,
-  ListItemText,
-} from '@mui/material';
+import { Grid, Paper, Button, Container, TextField, Typography } from '@mui/material';
+
+import api from '../../service/api';
+import BookSearchList from './book-search-list';
 
 const BookView = () => {
-  const [departureTerminal, setDepartureTerminal] = useState('');
-  const [arrivalTerminal, setArrivalTerminal] = useState('');
+  const [departureTerminal, setDepartureTerminal] = useState(null);
+  const [arrivalTerminal, setArrivalTerminal] = useState(null);
   const [availableTrains, setAvailableTrains] = useState([]);
 
-  const handleSearch = () => {
-    // Implement logic to fetch available trains based on departure and arrival terminals
-    // This is a placeholder, you should replace it with actual API calls or data fetching logic
-    const mockAvailableTrains = [
-      { id: 1, name: 'Express Train A', departureTime: '10:00 AM', arrivalTime: '01:00 PM' },
-      { id: 2, name: 'Local Train B', departureTime: '02:00 PM', arrivalTime: '05:00 PM' },
-      // Add more train details as needed
-    ];
-
-    setAvailableTrains(mockAvailableTrains);
+  const handleSearch = async () => {
+    if (departureTerminal === null || arrivalTerminal === null) {
+      console.log(availableTrains);
+    } else {
+      const departureResponse = await api.get(
+        `api/v1/trains/station?stationName=${departureTerminal}&station=0`
+      );
+      const arrivalResponse = await api.get(
+        `api/v1/trains/station?stationName=${arrivalTerminal}&station=1`
+      );
+      const departureData = await departureResponse?.data;
+      const arrivalData = await arrivalResponse?.data;
+      const availableTrainsData = [...departureData, ...arrivalData];
+      console.log(availableTrains);
+      setAvailableTrains(availableTrainsData);
+    }
   };
 
   return (
-    <Container maxWidth="md" style={{marginTop:'10vh'}}>
+    <Container style={{ marginTop: '10vh', width: '100%' }}>
       <Typography variant="h4" align="center" gutterBottom>
         Booking Page
       </Typography>
@@ -61,36 +60,20 @@ const BookView = () => {
             />
           </Grid>
         </Grid>
-
-        <Button
-          variant="contained"
-          color="primary"
-          fullWidth
-          style={{ marginTop: 20 }}
-          onClick={handleSearch}
+        <Container
+          style={{ marginTop: 20, display: 'flex', justifyContent: 'center', alignItems: 'center' }}
         >
-          Search Trains
-        </Button>
+          <Button variant="contained" color="primary" onClick={handleSearch}>
+            Search Trains
+          </Button>
+        </Container>
       </Paper>
-
-      {availableTrains.length > 0 && (
-        <Paper style={{ padding: 20 }}>
-          <Typography variant="h6" gutterBottom>
-            Available Trains
-          </Typography>
-
-          <List>
-            {availableTrains.map((train) => (
-              <ListItem key={train.id}>
-                <ListItemText
-                  primary={train.name}
-                  secondary={`Departure: ${train.departureTime} - Arrival: ${train.arrivalTime}`}
-                />
-              </ListItem>
-            ))}
-          </List>
-        </Paper>
+      {availableTrains?.length === 0 ? (
+        <p style={{ color: 'red', textAlign: 'center' }}>Not Available</p>
+      ) : (
+        <BookSearchList availableTrains={availableTrains} />
       )}
+
     </Container>
   );
 };

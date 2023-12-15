@@ -48,7 +48,7 @@ const Navigation = () => {
         roles: ['ADMIN'],
       },
       {
-        title: 'Train List',
+        title: 'Train Trip',
         path: '/dashboard/train',
         icon: icon('ic_user'),
         roles: ['ADMIN'],
@@ -60,14 +60,27 @@ const Navigation = () => {
         roles: ['ADMIN'],
       },
       {
+        title: 'Booked',
+        path: '/dashboard/booked-to-confirm',
+        icon: icon('ic_user'),
+        roles: ['ADMIN'],
+      },
+      {
         title: 'user',
         path: '/dashboard/user',
         icon: icon('ic_user'),
         roles: ['ADMIN'],
       },
+      
       {
         title: 'My Ticket',
         path: '/dashboard/ticket',
+        icon: icon('ic_user'),
+        roles: ['USER'],
+      },
+      {
+        title: 'Book',
+        path: '/dashboard/booking',
         icon: icon('ic_user'),
         roles: ['USER'],
       },

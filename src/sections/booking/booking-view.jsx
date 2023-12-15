@@ -6,7 +6,7 @@
 /* eslint-disable spaced-comment */
 /* eslint-disable import/extensions */
 /* eslint-disable import/no-unresolved */
-import React, { useMemo} from 'react';
+import React, { useEffect, useMemo, useState} from 'react';
 /* eslint-disable import/no-extraneous-dependencies */
 import {
   MRT_EditActionButtons,
@@ -18,6 +18,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import {
   Box,
   Button,
+  Container,
   DialogActions,
   DialogContent,
   DialogTitle,
@@ -32,12 +33,14 @@ import {
 import { useGet } from '../../service/useGet';
 // import { validateUser } from "../utils/validation";
 import { useUpdate } from '../../service/useUpdate';
-import { useDelete } from '../../service/useDelete';
+// import { useDelete } from '../../service/useDelete';
 
-function SchedulePage() {
+function BookingPage() {
   const [trainId, setTrainId] = React.useState('');
 //   const [manager, setManager] = React.useState('');
   const [departureTime, setDepartureTime] = React.useState('');
+  const [rowSelection, setRowSelection] = useState({});
+  const [rowSelectionId, setRowSelectionId] = useState([]);
 
   // const formik = useFormik({
   //   6     initialValues: {
@@ -59,46 +62,17 @@ function SchedulePage() {
   const columns = useMemo(
     () => [
       {
-        accessorKey: 'id',
-        header: 'Id',
-        enableEditing: false,
-        size: 80,
-      },
-      {
-        accessorKey: 'trainName',
-        header: 'Train Name',
-      },    
-      {
-        accessorKey: 'trainNumber',
-        header: 'Train Number',
-      },
-      {
-        accessorKey: 'totalCoach',
-        header: 'Total Coach',
-      },
-      {
-        accessorKey: 'seatingCapacityPerCouch',
-        header: 'Seating Capacity',
-      },
-      {
         accessorKey: 'fairPerSeat',
         header: 'Fair Per Seat',
+      },    
+      {
+        accessorKey: 'seatNumber',
+        header: 'Seat Number',
       },
       {
-        accessorKey: 'departureStation',
-        header: 'Departure Station',
+        accessorKey: 'status',
+        header: 'Status',
       },
-      {
-        accessorKey: 'arrivalStation',
-        header: 'Arrival Station',
-      },
-      {
-        accessorKey: 'departureTime',
-        header: 'Departure Time',
-        enableEditing: false,
-        Cell: ({ cell }) => cell?.getValue()?.replace("T", " ")?.replace(/\.\d{3}Z/, ""),
-        
-      }
     ],
     []
   );
@@ -110,9 +84,9 @@ function SchedulePage() {
   const {
     data: fetchedSchedules,
     isError:isLoadingScheduleError,
-    isFetching:isFetchingSchedule,
-    isPending: isLoadingSchedule,
-  } = useGet('api/v1/trains/scheduled');
+    // isFetching:isFetchingSchedule,
+    // isPending: isLoadingSchedule,
+  } = useGet(`api/v1/tickets?trainId=${trainId}&status=AVAILABLE`);
 
   const {
     data: fetchedTrain,
@@ -121,20 +95,20 @@ function SchedulePage() {
 
   // eslint-disable-next-line spaced-comment
   //call UPDATE hook
-  const { mutateAsync: updateUser, isPending: isUpdatingUser } = useUpdate(`api/v1/trains/${trainId}/schedule`);
+  const { mutateAsync: updateUser, isPending: isUpdatingUser } = useUpdate(`api/v1/tickets/book?trainId=${trainId}`);
   //call DELETE hook
-  const { isPending: isDeletingUser } = useDelete();
+//   const { isPending: isDeletingUser } = useDelete();
 
 
 
   //CREATE action
   const handleCreateSchedule = async ({ values }) => {
   
- console.log('tttt',trainId,departureTime)
-    
- await updateUser({
-  departureTime
- });
+ console.log('rrrrr',rowSelectionId,rowSelection)
+    const booked = {
+        "seatNumbers": rowSelectionId
+      }
+ await updateUser(booked);
     table.setCreatingRow(null); //exit creating mode
   };
 
@@ -150,14 +124,24 @@ function SchedulePage() {
     table.setEditingRow(null); //exit editing mode
   };
 
+
+  useEffect(() => {
+    const IdOfSelected = Object.keys(rowSelection);
+    setRowSelectionId(IdOfSelected);
+  }, [rowSelection]);
+
+
   const table = useMaterialReactTable({
     columns,
     data: fetchedSchedules || [],
     createDisplayMode: 'modal',
     editDisplayMode: 'modal',
     enableEditing: true,
+    enableRowSelection: true,
+    onRowSelectionChange: setRowSelection,
+    state: { rowSelection },
     positionActionsColumn: 'last',
-    getRowId: (row) => row.id,
+    getRowId: (row) => row.seatNumber,
     muiToolbarAlertBannerProps: isLoadingScheduleError
       ? {
           color: 'error',
@@ -229,7 +213,7 @@ function SchedulePage() {
         </Tooltip>
       </Box>
     ),
-    renderTopToolbarCustomActions: ({ table }) => (
+    renderBottomToolbarCustomActions: ({ table }) => (
       <Button
         variant="contained"
         style={{
@@ -239,27 +223,44 @@ function SchedulePage() {
           backgroundColor: 'green',
           color: 'white',
         }}
-        onClick={() => {
-          table.setCreatingRow(true);
-        }}
+        onClick={handleCreateSchedule}
       >
-         Schedule Train
+        {isUpdatingUser?"Booking..":'Book Train'} 
       </Button>
     ),
 
-    state: {
-      isLoading: isLoadingSchedule,
-      isSaving:  isUpdatingUser || isDeletingUser,
-      showAlertBanner: isLoadingScheduleError,
-      showProgressBars: isFetchingSchedule,
-    },
+    // state: {
+    //   isLoading: isLoadingSchedule,
+    //   isSaving:  isUpdatingUser || isDeletingUser,
+    //   showAlertBanner: isLoadingScheduleError,
+    //   showProgressBars: isFetchingSchedule,
+    // },
   });
 
   return (
     <>
       <Typography variant="h4" sx={{ mb: 5 }}>
-        Location list
+        Booking Page
       </Typography>
+      <Container>
+      <TextField
+              fullWidth
+              select
+              style={{ marginTop: '10px' }}
+              // id={name}
+              name=""
+              label="Train Name"
+              value={trainId}
+              onChange={(e)=> setTrainId(e.target.value)}
+        
+            >
+              {fetchedTrain?.map((train) => (
+                <MenuItem key={train?.id} value={train?.id}>
+                  {isLoadingTrain?"loading...":train?.trainName}
+                </MenuItem>
+              ))}
+            </TextField>
+      </Container>
       <MaterialReactTable table={table} />
      
       
@@ -268,4 +269,4 @@ function SchedulePage() {
   );
 }
 
-export default SchedulePage;
+export default BookingPage;

@@ -164,7 +164,7 @@ export default function LoginView() {
           }}
         >
           <Typography style={{ marginBottom: '30px' }} variant="h4">
-            SignIn To Train Ticket System
+            Train Ticket Booking System
           </Typography>
           {renderForm}
         </Card>

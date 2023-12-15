@@ -72,8 +72,8 @@ function TrainView() {
         header: 'Total Coach',
       },
       {
-        accessorKey: 'seatingCapacity',
-        header: 'Seating Capacity',
+        accessorKey: 'seatingCapacityPerCouch',
+        header: 'Seating Capacity per Couch',
       },
       {
         accessorKey: 'departureStation',
@@ -83,18 +83,18 @@ function TrainView() {
         accessorKey: 'arrivalStation',
         header: 'Arrival Station',
       },
-      {
-        accessorKey: 'createdAt',
-        header: 'Created At',
-        enableEditing: false,
-        Cell: ({ cell }) => cell?.getValue()?.split('T')[0],
-      },
-      {
-        accessorKey: 'updatedAt',
-        header: 'Updated At',
-        enableEditing: false,
-        Cell: ({ cell }) => cell?.getValue()?.split('T')[0],
-      },
+      // {
+      //   accessorKey: 'createdAt',
+      //   header: 'Created At',
+      //   enableEditing: false,
+      //   Cell: ({ cell }) => cell?.getValue()?.split('T')[0],
+      // },
+      // {
+      //   accessorKey: 'updatedAt',
+      //   header: 'Updated At',
+      //   enableEditing: false,
+      //   Cell: ({ cell }) => cell?.getValue()?.split('T')[0],
+      // },
     ],
     []
   );
@@ -140,10 +140,11 @@ function TrainView() {
 
   const formik = useFormik({
     initialValues: {
-      trainName: '',
+      departureTime: '',
       trainNumber: '',
-      totalCoach: 0,
-      seatingCapacity: 0,
+      totalCoach: null,
+      seatingCapacityPerCouch: null,
+      fairPerSeat:null,
       departureStation: '',
       arrivalStation: '',
     },
@@ -180,7 +181,7 @@ function TrainView() {
     onEditingRowSave: handleSaveUser,
     renderCreateRowDialogContent: ({ table, row, internalEditComponents }) => (
       <>
-        <DialogTitle variant="h5">Add New Train</DialogTitle>
+        <DialogTitle variant="h5">Add New Train Trip</DialogTitle>
         <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
           <form onSubmit={formik.handleSubmit}>
             <TextField
@@ -215,11 +216,20 @@ function TrainView() {
 
             <TextField
               fullWidth
-              name="seatingCapacity"
+              name="seatingCapacityPerCouch"
               style={{ marginTop: '10px' }}
               id="outlined-controlled"
               label="Seating Capacity"
-              value={formik.values.seatingCapacity}
+              value={formik.values.seatingCapacityPerCouch}
+              onChange={formik.handleChange}
+            />
+            <TextField
+              fullWidth
+              name="fairPerSeat"
+              style={{ marginTop: '10px' }}
+              id="outlined-controlled"
+              label="Fair per Seat"
+              value={formik.values.fairPerSeat}
               onChange={formik.handleChange}
             />
             <TextField
@@ -299,7 +309,7 @@ function TrainView() {
           table.setCreatingRow(true);
         }}
       >
-        Add New Train
+        Add Train Trip
       </Button>
     ),
 

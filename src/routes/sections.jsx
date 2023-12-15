@@ -1,13 +1,17 @@
 import { lazy, Suspense } from 'react';
 import { Outlet, useRoutes } from 'react-router-dom';
 
+import { CircularProgress } from '@mui/material';
+
 // eslint-disable-next-line no-unused-vars, unused-imports/no-unused-imports
 import HomePage from 'src/pages/home';
-
-// eslint-disable-next-line perfectionist/sort-imports
-import DashboardLayout from 'src/layouts/dashboard';
 // eslint-disable-next-line perfectionist/sort-imports
 import { useAuth } from 'src/context/AuthContext';
+// eslint-disable-next-line perfectionist/sort-imports
+import DashboardLayout from 'src/layouts/dashboard';
+
+import { BookedView, BookingView } from 'src/sections/booking';
+
 
 export const NAV = lazy(() => import('src/components/nav/Nav'));
 export const IndexPage = lazy(() => import('src/pages/app'));
@@ -17,6 +21,7 @@ export const RoutinePage = lazy(() => import('src/pages/routine'));
 export const LocationPage = lazy(() => import('src/pages/location'));
 export const TrainPage = lazy(() => import('src/pages/train'));
 export const BookPage = lazy(() => import('src/pages/booking'));
+// export const BookingView = lazy(()=> import('src/sections/booking/index'));
 export const SchedulePage = lazy(() => import('src/pages/schedule'));
 export const TicketPage = lazy(() => import('src/pages/ticket'));
 export const UserPage = lazy(() => import('src/pages/user'));
@@ -72,9 +77,9 @@ export default function Router() {
     {
       element:
         isAuthenticated &&
-        (userRole === 'ADMIN' || userRole === 'USER' || userRole === 'MANAGER') ? (
+        (userRole === 'ADMIN' || userRole === 'USER') ? (
           <DashboardLayout>
-            <Suspense>
+            <Suspense fallback={<CircularProgress />}>
               <Outlet />
             </Suspense>
           </DashboardLayout>
@@ -86,6 +91,8 @@ export default function Router() {
         { path: '/dashboard/location', element: <LocationPage /> },
         { path: '/dashboard/train', element: <TrainPage /> },
         { path: '/dashboard/schedule', element: <SchedulePage /> },
+        { path: '/dashboard/booking', element: <BookingView /> },
+        { path: '/dashboard/booked-to-confirm', element: <BookedView /> },
         { path: '/dashboard/ticket', element: <TicketPage /> },
         { path: '/dashboard/user', element: <UserPage /> },
       ],

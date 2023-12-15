@@ -28,7 +28,6 @@ import {
 } from '@mui/material';
 
 import { useGet } from '../../../service/useGet';
-import AddManagerModal from '../AddManagerModal';
 import { usePost } from '../../../service/usePost';
 // import { validateUser } from "../utils/validation";
 import { useUpdate } from '../../../service/useUpdate';
@@ -36,19 +35,11 @@ import { useDelete } from '../../../service/useDelete';
 
 function UserPage() {
   const [validationErrors, setValidationErrors] = useState({});
-  const [open, setOpen] = React.useState(false);
   const [fullName, setFullName] = React.useState('');
   const [username, setuserName] = React.useState('');
   const [password, setPassword] = React.useState('');
 
-  const handleClickOpen = () => {
-    setOpen(true);
-  };
-
-  const handleClose = () => {
-    setOpen(false);
-  };
-
+ 
 
   const { data: roles } = useGet('/api/v1/roles');
   const roleNames = roles?.map((role) => role.roleName);
@@ -146,25 +137,15 @@ function UserPage() {
   const { isPending: isDeletingUser } = useDelete();
 
   //CREATE action
-  const handleCreateUser = async ({ values }) => {
-    // const newValidationErrors = validateUser(values);
-    // if (Object.values(newValidationErrors).some((error) => error)) {
-    //   setValidationErrors(newValidationErrors);
-    //   return;
-    // }
-    // setValidationErrors({});
-
-    const transformedData = {
+  const handleCreateUser = async () => {
+    await createUser({
       password,
       fullName,
       username,
-    };
-
-    console.log(transformedData);
-    await createUser(transformedData);
-    setFullName('')
-    setuserName('')
-    setPassword('')
+    });
+    setFullName('');
+    setuserName('');
+    setPassword('');
     table.setCreatingRow(null); //exit creating mode
   };
 
@@ -269,8 +250,7 @@ function UserPage() {
       </Box>
     ),
     renderTopToolbarCustomActions: ({ table }) => (
-      <>
-        <Button
+      <Button
           variant="contained"
           style={{
             width: '10%',
@@ -285,20 +265,6 @@ function UserPage() {
         >
           Create New User
         </Button>
-        <Button
-          variant="contained"
-          style={{
-            width: '10%',
-            margin: '5px',
-            padding: '10px',
-            backgroundColor: 'green',
-            color: 'white',
-          }}
-          onClick={handleClickOpen}
-        >
-          Add manager
-        </Button>
-      </>
     ),
 
     state: {
@@ -314,8 +280,6 @@ function UserPage() {
       <Typography variant="h4" sx={{ mb: 5 }}>
         User List
       </Typography>
-      
-      <AddManagerModal open={open} handleClose={handleClose} />
 
       <MaterialReactTable table={table} />
     </>
