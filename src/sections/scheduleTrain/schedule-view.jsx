@@ -258,7 +258,7 @@ function SchedulePage() {
   return (
     <>
       <Typography variant="h4" sx={{ mb: 5 }}>
-        Location list
+        Scheduled list
       </Typography>
       <MaterialReactTable table={table} />
      

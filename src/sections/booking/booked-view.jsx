@@ -240,7 +240,7 @@ function BookedPage() {
   return (
     <>
       <Typography variant="h4" sx={{ mb: 5 }}>
-        Booking Page
+        Booked List Page
       </Typography>
       <Container>
       <TextField

@@ -324,7 +324,7 @@ function TrainView() {
   return (
     <>
       <Typography variant="h4" sx={{ mb: 5 }}>
-        Location list
+        Train list
       </Typography>
       <MaterialReactTable table={table} />
     </>

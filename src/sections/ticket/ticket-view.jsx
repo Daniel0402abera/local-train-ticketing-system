@@ -14,7 +14,7 @@ import {
   useMaterialReactTable,
 } from 'material-react-table';
 
-import EditIcon from '@mui/icons-material/Edit';
+import CancelIcon from '@mui/icons-material/Cancel';
 import {
   Box,
   Button,
@@ -99,7 +99,8 @@ function TicketPage() {
 
   // eslint-disable-next-line spaced-comment
   //call UPDATE hook
-  const { mutateAsync: updateUser, isPending: isUpdatingUser } = useUpdate(`api/v1/tickets/confirm?trainId=${trainId}`);
+  const { mutateAsync: updateBooked, isPending: isUpdatingUser } = useUpdate(`api/v1/tickets/confirm?trainId=${trainId}`);
+  const { mutateAsync: updateBookedTicket } = useUpdate(`api/v1/tickets/cancel?trainId=${trainId}`);
   //call DELETE hook
 //   const { isPending: isDeletingUser } = useDelete();
 
@@ -112,19 +113,19 @@ function TicketPage() {
     const booked = {
         "seatNumbers": rowSelectionId
       }
- await updateUser(booked);
+ await updateBooked(booked);
     table.setCreatingRow(null); //exit creating mode
   };
 
   //UPDATE action
-  const handleSaveUser = async ({ values, table }) => {
+  const handleCancledTicket = async ({ values, table }) => {
+    const bookedCancle = {
+      "seatNumbers": rowSelectionId
+    }
 
-
-    const data = {
-      fullName: values?.fullName,
-    };
-
-    await updateUser(data);
+    if (window.confirm('Are you sure you want to Cancle Booked Ticket?')) {
+      await updateBookedTicket(bookedCancle);
+    }
     table.setEditingRow(null); //exit editing mode
   };
 
@@ -160,7 +161,7 @@ function TicketPage() {
     // onCreatingRowCancel: () => setValidationErrors({}),
     onCreatingRowSave: handleCreateSchedule,
     // onEditingRowCancel: () => setValidationErrors({}),
-    onEditingRowSave: handleSaveUser,
+    onEditingRowSave: handleCancledTicket,
     renderCreateRowDialogContent: ({ table, row, internalEditComponents }) => (
       <>
         <DialogTitle variant="h5">Create New Location</DialogTitle>
@@ -210,10 +211,17 @@ function TicketPage() {
     ),
     renderRowActions: ({ row, table }) => (
       <Box sx={{ display: 'flex', gap: '1rem' }}>
-        <Tooltip title="Edit">
-          <IconButton onClick={() => table.setEditingRow(row)}>
-            <EditIcon />
-          </IconButton>
+        <Tooltip title="Cancel Booked">
+          {row?.original?.status === 'CONFIRMED'?
+          <IconButton disabled>
+          <CancelIcon />
+        </IconButton>:
+<IconButton onClick={handleCancledTicket}>
+<CancelIcon />
+</IconButton>}
+          {/* <IconButton onClick={() => table.setEditingRow(row)}>
+            <CancelIcon />
+          </IconButton> */}
         </Tooltip>
       </Box>
     ),
@@ -244,7 +252,7 @@ function TicketPage() {
   return (
     <>
       <Typography variant="h4" sx={{ mb: 5 }}>
-        Booking Page
+        My Ticked Page
       </Typography>
       <Container>
       <TextField
