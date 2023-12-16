@@ -175,7 +175,7 @@ function SchedulePage() {
     onEditingRowSave: handleSaveUser,
     renderCreateRowDialogContent: ({ table, row, internalEditComponents }) => (
       <>
-        <DialogTitle variant="h5">Create New Location</DialogTitle>
+        <DialogTitle variant="h5">Create New Train Schedule</DialogTitle>
         <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
         <TextField
               fullWidth

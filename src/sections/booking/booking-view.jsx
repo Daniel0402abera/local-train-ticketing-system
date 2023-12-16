@@ -9,24 +9,15 @@
 import React, { useEffect, useMemo, useState} from 'react';
 /* eslint-disable import/no-extraneous-dependencies */
 import {
-  MRT_EditActionButtons,
   MaterialReactTable,
   useMaterialReactTable,
 } from 'material-react-table';
 
-import EditIcon from '@mui/icons-material/Edit';
 import {
-  Box,
   Button,
   Container,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  IconButton,
-  InputLabel,
   MenuItem,
   TextField,
-  Tooltip,
   Typography,
 } from '@mui/material';
 
@@ -37,8 +28,6 @@ import { useUpdate } from '../../service/useUpdate';
 
 function BookingPage() {
   const [trainId, setTrainId] = React.useState('');
-//   const [manager, setManager] = React.useState('');
-  const [departureTime, setDepartureTime] = React.useState('');
   const [rowSelection, setRowSelection] = useState({});
   const [rowSelectionId, setRowSelectionId] = useState([]);
 
@@ -112,19 +101,6 @@ function BookingPage() {
     table.setCreatingRow(null); //exit creating mode
   };
 
-  //UPDATE action
-  const handleSaveUser = async ({ values, table }) => {
-
-
-    const data = {
-      fullName: values?.fullName,
-    };
-
-    await updateUser(data);
-    table.setEditingRow(null); //exit editing mode
-  };
-
-
   useEffect(() => {
     const IdOfSelected = Object.keys(rowSelection);
     setRowSelectionId(IdOfSelected);
@@ -135,8 +111,6 @@ function BookingPage() {
     columns,
     data: fetchedSchedules || [],
     createDisplayMode: 'modal',
-    editDisplayMode: 'modal',
-    enableEditing: true,
     enableRowSelection: true,
     onRowSelectionChange: setRowSelection,
     state: { rowSelection },
@@ -156,63 +130,12 @@ function BookingPage() {
     // onCreatingRowCancel: () => setValidationErrors({}),
     onCreatingRowSave: handleCreateSchedule,
     // onEditingRowCancel: () => setValidationErrors({}),
-    onEditingRowSave: handleSaveUser,
-    renderCreateRowDialogContent: ({ table, row, internalEditComponents }) => (
-      <>
-        <DialogTitle variant="h5">Create New Location</DialogTitle>
-        <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-        <TextField
-              fullWidth
-              select
-              style={{ marginTop: '10px' }}
-              // id={name}
-              name=""
-              label="Train Name"
-              value={trainId}
-              onChange={(e)=> setTrainId(e.target.value)}
-        
-            >
-              {fetchedTrain?.map((train) => (
-                <MenuItem key={train?.id} value={train?.id}>
-                  {isLoadingTrain?"loading...":train?.trainName}
-                </MenuItem>
-              ))}
-            </TextField>
-          <InputLabel id="demo-simple-select-label">Schedule Time</InputLabel>
-          <TextField
-            type="datetime-local"
-            style={{ marginTop: '10px' }}
-            id="outlined-controlled"
-            value={departureTime}
-            onChange={(e)=> setDepartureTime(e.target.value) }
-          />
-        </DialogContent>
-        <DialogActions>
-          <MRT_EditActionButtons variant="text" table={table} row={row} />
-        </DialogActions>
-      </>
-    ),
+  
+  
     //optionally customize modal content
-    renderEditRowDialogContent: ({ table, row, internalEditComponents }) => (
-      <>
-        <DialogTitle variant="h5">Edit Location</DialogTitle>
-        <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-          {internalEditComponents}
-        </DialogContent>
-        <DialogActions>
-          <MRT_EditActionButtons variant="text" table={table} row={row} />
-        </DialogActions>
-      </>
-    ),
-    renderRowActions: ({ row, table }) => (
-      <Box sx={{ display: 'flex', gap: '1rem' }}>
-        <Tooltip title="Edit">
-          <IconButton onClick={() => table.setEditingRow(row)}>
-            <EditIcon />
-          </IconButton>
-        </Tooltip>
-      </Box>
-    ),
+   
+  
+
     renderBottomToolbarCustomActions: ({ table }) => (
       <Button
         variant="contained"
