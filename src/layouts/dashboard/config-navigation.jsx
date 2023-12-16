@@ -44,25 +44,25 @@ const Navigation = () => {
       {
         title: 'Location List',
         path: '/dashboard/location',
-        icon: icon('ic_user'),
+        icon: icon('location'),
         roles: ['ADMIN'],
       },
       {
         title: 'Train Trip',
         path: '/dashboard/train',
-        icon: icon('ic_user'),
+        icon: icon('train'),
         roles: ['ADMIN'],
       },
       {
         title: 'Schedule Train',
         path: '/dashboard/schedule',
-        icon: icon('ic_user'),
+        icon: icon('schedule'),
         roles: ['ADMIN'],
       },
       {
         title: 'Booked',
         path: '/dashboard/booked-to-confirm',
-        icon: icon('ic_user'),
+        icon: icon('booking'),
         roles: ['ADMIN'],
       },
       {
@@ -75,13 +75,13 @@ const Navigation = () => {
       {
         title: 'My Ticket',
         path: '/dashboard/ticket',
-        icon: icon('ic_user'),
+        icon: icon('ticket'),
         roles: ['USER'],
       },
       {
         title: 'Book',
         path: '/dashboard/booking',
-        icon: icon('ic_user'),
+        icon: icon('booking'),
         roles: ['USER'],
       },
     ], userRole);

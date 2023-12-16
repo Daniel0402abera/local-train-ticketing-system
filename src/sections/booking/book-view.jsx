@@ -1,7 +1,15 @@
 import React, { useState } from 'react';
 
 // eslint-disable-next-line import/no-extraneous-dependencies
-import { Grid, Paper, Button, Container, TextField, Typography } from '@mui/material';
+import {
+  Grid,
+  Paper,
+  Button,
+  Container,
+  TextField,
+  Typography,
+  CircularProgress,
+} from '@mui/material';
 
 import api from '../../service/api';
 import BookSearchList from './book-search-list';
@@ -10,11 +18,13 @@ const BookView = () => {
   const [departureTerminal, setDepartureTerminal] = useState(null);
   const [arrivalTerminal, setArrivalTerminal] = useState(null);
   const [availableTrains, setAvailableTrains] = useState([]);
+  const [searching, setSearching] = useState(false);
 
   const handleSearch = async () => {
     if (departureTerminal === null || arrivalTerminal === null) {
-      console.log(availableTrains);
+      setSearching(true);
     } else {
+      setSearching(true);
       const departureResponse = await api.get(
         `api/v1/trains/station?stationName=${departureTerminal}&station=0`
       );
@@ -69,11 +79,10 @@ const BookView = () => {
         </Container>
       </Paper>
       {availableTrains?.length === 0 ? (
-        <p style={{ color: 'red', textAlign: 'center' }}>Not Available</p>
+        <>{searching ? <CircularProgress /> : ''}</>
       ) : (
         <BookSearchList availableTrains={availableTrains} />
       )}
-
     </Container>
   );
 };

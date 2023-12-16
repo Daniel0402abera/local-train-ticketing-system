@@ -8,7 +8,7 @@ export default function RoutinePage() {
   return (
     <>
       <Helmet>
-        <title> ticket </title>
+        <title>Ticket </title>
       </Helmet>
       <TicketView />
     </>
