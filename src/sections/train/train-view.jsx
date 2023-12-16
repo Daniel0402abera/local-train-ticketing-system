@@ -83,18 +83,6 @@ function TrainView() {
         accessorKey: 'arrivalStation',
         header: 'Arrival Station',
       },
-      // {
-      //   accessorKey: 'createdAt',
-      //   header: 'Created At',
-      //   enableEditing: false,
-      //   Cell: ({ cell }) => cell?.getValue()?.split('T')[0],
-      // },
-      // {
-      //   accessorKey: 'updatedAt',
-      //   header: 'Updated At',
-      //   enableEditing: false,
-      //   Cell: ({ cell }) => cell?.getValue()?.split('T')[0],
-      // },
     ],
     []
   );
@@ -122,9 +110,8 @@ function TrainView() {
 
   //CREATE action
   const handleCreateUser = async () => {
-    
-    console.log('vvvvvv',validationSchema)
     await createUser(formik.values);
+    formik.resetForm();
     table.setCreatingRow(null); //exit creating mode
   };
 
@@ -150,7 +137,7 @@ function TrainView() {
     },
     validationSchema,
     onSubmit: (values) => {
-      console.log(values);
+  
     },
   });
 

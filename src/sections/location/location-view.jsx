@@ -41,21 +41,6 @@ function LocationPage() {
 //   const [manager, setManager] = React.useState('');
   const [description, setDescription] = React.useState('');
 
-  // const formik = useFormik({
-  //   6     initialValues: {
-  //   7       firstName: '',
-  //   8       lastName: '',
-  //   9       email: '',
-  //   10     },
-  //   11     onSubmit: values => {
-  //   12
-  //   13     },
-  //   14   });
-
-  // eslint-disable-next-line spaced-comment
-  //call read hook of role api
-
-  // api/v1/users?role=MANAGER
 
 
   const columns = useMemo(
@@ -116,6 +101,8 @@ function LocationPage() {
     }
     
     await createUser(transformedData);
+    setName('');
+    setDescription('')
     table.setCreatingRow(null); //exit creating mode
   };
 

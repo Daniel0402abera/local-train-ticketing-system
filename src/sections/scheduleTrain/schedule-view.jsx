@@ -129,12 +129,13 @@ function SchedulePage() {
 
   //CREATE action
   const handleCreateSchedule = async ({ values }) => {
-  
- console.log('tttt',trainId,departureTime)
+
     
  await updateUser({
   departureTime
  });
+ setDepartureTime('')
+ setTrainId('')
     table.setCreatingRow(null); //exit creating mode
   };
 
