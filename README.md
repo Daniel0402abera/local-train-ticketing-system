@@ -41,10 +41,12 @@ Once the containers are up and running, you can access the Train Booking  app by
 
 #For Admin
 - userName: john@admin.com
+- 
 - password: 123456
 
 
 #For User
 
   -userName :user2
+  
   -password:123456
